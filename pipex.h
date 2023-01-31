@@ -6,7 +6,7 @@
 /*   By: emajuri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/18 14:51:26 by emajuri           #+#    #+#             */
-/*   Updated: 2023/01/24 14:20:59 by emajuri          ###   ########.fr       */
+/*   Updated: 2023/01/31 16:26:05 by emajuri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,15 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 
-enum e_index
+typedef struct s_vars
 {
-	FILE1 = 1,
-	CMD1 = 2,
-	CMD2 = 3,
-	FILE2 = 4,
-	READ = 0,
-	WRITE = 1
-};
+	int	count;
+	int	fd_in;
+	int	fd_out;
+	int	new[2];
+} t_vars;
 
 char	**split_quote(const char *str, int delim);
+char	**add_filepath(char **argv, int cmd_i);
 
 #endif
