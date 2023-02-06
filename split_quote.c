@@ -6,7 +6,7 @@
 /*   By: emajuri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/18 17:48:18 by emajuri           #+#    #+#             */
-/*   Updated: 2023/01/20 14:44:01 by emajuri          ###   ########.fr       */
+/*   Updated: 2023/02/06 15:00:05 by emajuri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	write_data(const char *str, char **ptr, int words, int delim)
 
 	tmp = (char *)(ptr + words);
 	i = 0;
-	while(words-- > 1)
+	while (words-- > 1)
 	{
 		ptr[i] = tmp;
 		strlen = 0;
@@ -85,7 +85,7 @@ void	write_data(const char *str, char **ptr, int words, int delim)
 	ptr[i] = NULL;
 }
 
-char **split_quote(const char *str, int delim)
+char	**split_quote(const char *str, int delim)
 {
 	char	**ptr;
 	int		full_len;

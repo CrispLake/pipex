@@ -6,120 +6,98 @@
 /*   By: emajuri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/18 15:07:52 by emajuri           #+#    #+#             */
-/*   Updated: 2023/01/31 17:40:07 by emajuri          ###   ########.fr       */
+/*   Updated: 2023/02/06 15:26:13 by emajuri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-int	make_fd(int commands, t_vars *vars, int *old, char **argv)
-{
-	int	file1;
-	int	file2;
-	int	old0;
-	int old1;
-
-	old0 = old[0];
-	old1 = old[1];
-	if (vars->count != 1 && vars->count != commands)
-	{
-		if (pipe(vars->new))
-		{
-			exit (-1);
-		}
-	}
-	if (vars->count == 1)
-	{
-		file1 = open(argv[vars->count], O_RDONLY);
-		vars->fd_in = dup(file1);
-		close(file1);
-		vars->fd_out = dup(old1);
-		close(old1);
-		vars->new[0] = old0;
-	}
-	else if (vars->count < commands)
-	{
-		vars->fd_in = dup(old0);
-		close(old0);
-		vars->fd_out = dup(vars->new[1]);
-		close(vars->new[1]);
-	}
-	else
-	{
-		vars->fd_in = dup(old0);
-		close(old0);
-		file2 = open(argv[commands + 2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		vars->fd_out = dup(file2);
-		close(file2);
-	}
-	return (0);
-}
 
 void	init_vars(t_vars *vars)
 {
 	vars->count = 1;
 	vars->fd_in = 0;
 	vars->fd_out = 0;
+	vars->pids = NULL;
 }
 
-void	child(t_vars *vars, int new[2], char **cmd, int commands)
+int	fork_error(char **cmd, t_vars *vars, int commands)
 {
-	extern char	**environ;
-
-	dup2(vars->fd_in, 0);
-	dup2(vars->fd_out, 1);
+	perror("Error forking in main");
+	free(cmd);
+	free(vars->pids);
 	close(vars->fd_in);
 	close(vars->fd_out);
 	if (vars->count < commands)
-		close(new[0]);
-	execve(cmd[0], cmd + 1, environ);
-	free(cmd);
+		close(vars->new[0]);
 	exit(-1);
+}
+
+void	wait_all(int *pids, int cmd_count)
+{
+	int	wstatus;
+	int	i;
+
+	i = 0;
+	wstatus = 0;
+	while (i <= cmd_count)
+	{
+		waitpid(pids[i], &wstatus, 0);
+		if (WIFEXITED(wstatus))
+		{
+			if (WEXITSTATUS(wstatus) == -1)
+			{
+				free(pids);
+				exit(-1);
+			}
+		}
+		i++;
+	}
+	free(pids);
+}
+
+int	first_checks(int argc, t_vars *vars)
+{
+	if (argc < 5)
+	{
+		ft_printf("Too little arguments\n");
+		return (-1);
+	}
+	init_vars(vars);
+	vars->pids = ft_calloc(argc - 3, sizeof(int));
+	if (!vars->pids)
+	{
+		perror("Error in ft_calloc");
+		return (-1);
+	}
+	if (pipe(vars->new))
+	{
+		free(vars->pids);
+		perror("Creating pipe failed in first_checks");
+		return (-1);
+	}
+	return (0);
 }
 
 int	main(int argc, char **argv)
 {
 	t_vars	vars;
 	char	**cmd;
-	int		pid;
-	int		wstatus;
 
-	init_vars(&vars);
-	if (pipe(vars.new))
-	{
-		perror("Creating pipe failed in main");
-		exit(-1);
-	}
+	if (first_checks(argc, &vars))
+		return (-1);
 	while (vars.count <= argc - 3)
 	{
 		make_fd(argc - 3, &vars, vars.new, argv);
 		cmd = add_filepath(argv, vars.count + 1);
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("Error forking in main");
-			free(cmd);
-			close(vars.fd_in);
-			close(vars.fd_out);
-			if (vars.count < argc - 3)
-				close(vars.new[0]);
-			exit (-1);
-		}
-		else if (pid == 0)
+		if (!cmd)
+			filepath_error(vars.pids);
+		vars.pids[vars.count - 1] = fork();
+		if (vars.pids[vars.count - 1] == -1)
+			fork_error(cmd, &vars, argc - 3);
+		else if (vars.pids[vars.count - 1] == 0)
 			child(&vars, vars.new, cmd, argc - 3);
-		wait(&wstatus);
-		close(vars.fd_in);
-		close(vars.fd_out);
-		if (WIFEXITED(wstatus))
-		{
-			if (WEXITSTATUS(wstatus) == -1)
-			{
-				perror("Error in executing command");
-				exit(-1);
-			}
-		}
-		vars.count++;
+		parent(&vars, cmd);
 	}
-	free(cmd);
+	wait_all(vars.pids, vars.count - 2);
 	return (0);
 }

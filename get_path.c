@@ -6,13 +6,13 @@
 /*   By: emajuri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 15:22:30 by emajuri           #+#    #+#             */
-/*   Updated: 2023/01/31 17:23:32 by emajuri          ###   ########.fr       */
+/*   Updated: 2023/02/06 15:21:53 by emajuri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char *test_paths(char *path, char *cmd)
+char	*test_paths(char *path, char *cmd)
 {
 	char	*str;
 	char	*str2;
@@ -21,7 +21,7 @@ char *test_paths(char *path, char *cmd)
 
 	flag = 0;
 	cmd_i = 0;
-	while(cmd[cmd_i] != ' ' && cmd[cmd_i] != '\0')
+	while (cmd[cmd_i] != ' ' && cmd[cmd_i] != '\0')
 	{
 		cmd_i++;
 		if (cmd[cmd_i] == '\0')
@@ -47,7 +47,7 @@ char	*get_path(char *cmd, int i)
 	char		**paths;
 	char		*path;
 
-	while(ft_strncmp(environ[i], "PATH=", 5) && environ[i])
+	while (ft_strncmp(environ[i], "PATH=", 5) && environ[i])
 		i++;
 	if (!environ[i])
 		return (NULL);
@@ -56,7 +56,7 @@ char	*get_path(char *cmd, int i)
 		return (NULL);
 	path = NULL;
 	i = 0;
-	while(paths[i] && path == NULL)
+	while (paths[i] && path == NULL)
 		path = test_paths(paths[i++], cmd);
 	if (paths[i] == NULL)
 	{
@@ -88,4 +88,11 @@ char	**add_filepath(char **argv, int cmd_i)
 	cmd = split_quote(full, ' ');
 	free(full);
 	return (cmd);
+}
+
+void	filepath_error(int *pids)
+{
+	free(pids);
+	ft_printf("Command not found\n");
+	exit(-1);
 }

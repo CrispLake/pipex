@@ -6,7 +6,7 @@
 #    By: emajuri <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/24 16:39:22 by emajuri           #+#    #+#              #
-#    Updated: 2023/01/31 13:35:01 by emajuri          ###   ########.fr        #
+#    Updated: 2023/02/06 15:10:45 by emajuri          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = pipex
 
 LIBFT = libft.a
 
-SRC = pipex.c split_quote.c get_path.c
+SRC = pipex.c split_quote.c get_path.c make_fd.c parent_n_child.c
 
 OSRC = $(SRC:%.c=%.o)
 
