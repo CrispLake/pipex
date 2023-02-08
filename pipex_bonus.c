@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emajuri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/18 15:07:52 by emajuri           #+#    #+#             */
-/*   Updated: 2023/02/08 18:42:47 by emajuri          ###   ########.fr       */
+/*   Updated: 2023/02/08 18:40:36 by emajuri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,9 @@ void	wait_all(int *pids, int cmd_count)
 
 int	first_checks(int argc, t_vars *vars)
 {
-	if (argc != 5)
+	if (argc < 5)
 	{
-		ft_printf("Incorrect amount of arguments\n");
+		ft_printf("Too little arguments\n");
 		return (-1);
 	}
 	init_vars(vars);
